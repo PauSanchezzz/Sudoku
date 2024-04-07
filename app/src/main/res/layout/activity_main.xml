@@ -46,14 +46,14 @@
         app:layout_constraintVertical_bias="0.0">
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/beginnerButton"
             android:layout_width="match_parent"
             android:layout_height="58dp"
             android:text="Principiante"
             android:textSize="22sp" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/intermediateButton"
             android:layout_width="match_parent"
             android:layout_height="58dp"
             android:layout_marginTop="10dp"
@@ -62,7 +62,7 @@
             android:textSize="22sp" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/advancedButton"
             android:layout_width="match_parent"
             android:layout_height="58dp"
             android:text="Avanzado"
