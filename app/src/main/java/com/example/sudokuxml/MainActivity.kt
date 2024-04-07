@@ -26,11 +26,11 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         beginnerButton = findViewById(R.id.beginnerButton)
-        beginnerButton.setOnClickListener({ onClickLevel("easy") })
+        beginnerButton.setOnClickListener({ onClickLevel("Facil") })
         intermediateButton = findViewById(R.id.intermediateButton)
-        intermediateButton.setOnClickListener({ onClickLevel("intermediate") })
+        intermediateButton.setOnClickListener({ onClickLevel("Intermedio") })
         advancedButton = findViewById(R.id.advancedButton)
-        advancedButton.setOnClickListener({ onClickLevel("advanced") })
+        advancedButton.setOnClickListener({ onClickLevel("Avanzado") })
 
     }
 

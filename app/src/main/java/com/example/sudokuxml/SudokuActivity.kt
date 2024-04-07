@@ -1,14 +1,18 @@
 package com.example.sudokuxml
 
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
+
 class SudokuActivity : AppCompatActivity() {
-    private lateinit var txtDif: TextView
+    private lateinit var toolbar: Toolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -20,8 +24,11 @@ class SudokuActivity : AppCompatActivity() {
         }
         val difficult = intent.getStringExtra(DIFFICULT_LEVEL)
 
-        txtDif = findViewById<TextView>(R.id.textView2)
-        txtDif.setText(difficult)
+        toolbar = findViewById<View>(R.id.sudokuToolBar) as Toolbar
+        setSupportActionBar(toolbar)
+        if (supportActionBar != null) {
+            supportActionBar!!.title = "Dificultad Seleccionada: $difficult"
+        }
     }
 
     companion object {
