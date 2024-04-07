@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:text="eliminar"
+            android:text="Eliminar"
             />
     </LinearLayout>
 
@@ -50,11 +50,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:columnCount="3"
-        android:horizontalSpacing="6dp"
         android:rowCount="3"
+        android:horizontalSpacing="6dp"
         android:verticalSpacing="6dp">
         <Button
-            android:id="@+id/button"
+            android:id="@+id/button1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_row="0"
