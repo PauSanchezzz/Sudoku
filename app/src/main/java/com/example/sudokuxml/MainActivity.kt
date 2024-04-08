@@ -2,14 +2,11 @@ package com.example.sudokuxml
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-
 
 class MainActivity : AppCompatActivity() {
     private lateinit var beginnerButton: Button
@@ -31,7 +28,6 @@ class MainActivity : AppCompatActivity() {
         intermediateButton.setOnClickListener({ onClickLevel("Intermedio") })
         advancedButton = findViewById(R.id.advancedButton)
         advancedButton.setOnClickListener({ onClickLevel("Avanzado") })
-
     }
 
     fun onClickLevel(difficult: String) {
