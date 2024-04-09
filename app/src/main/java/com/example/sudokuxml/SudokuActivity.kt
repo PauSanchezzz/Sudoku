@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -14,11 +15,13 @@ import androidx.appcompat.widget.Toolbar
 import java.util.Locale
 
 class SudokuActivity : AppCompatActivity() {
+
     private var countDownTimer: CountDownTimer? = null
     private lateinit var toolbar: Toolbar
     private lateinit var txtTimer: TextView
+    private lateinit var checkBTN: Button
     private var gameBoard: SudokuBoard? = null
-    private var gameBoardMan: BoardManager? = null
+    public var gameBoardMan: BoardManager? = null
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -32,12 +35,16 @@ class SudokuActivity : AppCompatActivity() {
 
         txtTimer = findViewById(R.id.txtTimer)
         toolbar = findViewById<View>(R.id.sudokuToolBar) as Toolbar
+        checkBTN = findViewById(R.id.check)
+
         setSupportActionBar(toolbar)
 
         if (supportActionBar != null) {
             supportActionBar!!.title = "Dificultad Seleccionada: $difficult"
         }
         TimeGame()
+        fillBoard()
+
     }
 
     companion object {
@@ -112,8 +119,8 @@ class SudokuActivity : AppCompatActivity() {
         val difficult = intent.getStringExtra(DIFFICULT_LEVEL)
 
         val time: Long = when (difficult) {
-            "Facil" -> 60000
-            "Intermedio" -> 30000
+            "Facil" -> 300000
+            "Intermedio" -> 150000
             "Avanzado" -> 15000
             else -> 0
         }
@@ -141,5 +148,82 @@ class SudokuActivity : AppCompatActivity() {
         }
         (countDownTimer as CountDownTimer).start()
     }
+
+    private fun fillBoard() {
+
+        val difficult = intent.getStringExtra(DIFFICULT_LEVEL)
+
+        val quickTip: Float = when (difficult) {
+            "Facil" -> 0.2F
+            "Intermedio" -> 0.1F
+            "Avanzado" -> 0.1F
+            else -> 0F
+        }
+
+        val numbers = (1..9).toMutableList()
+
+        val random = kotlin.random.Random
+        for (i in 0 until 9) {
+            for (j in 0 until 9) {
+                if (random.nextDouble() <= quickTip) {
+                    numbers.shuffle()
+                    val randomNumber = numbers[0]
+                    if (gameBoardMan!!.isValid(i, j, randomNumber)) {
+                        gameBoardMan!!.board[i][j] = randomNumber
+                        gameBoardMan!!.editable[i][j] = false
+                    }
+                }
+            }
+        }
+    }
+
+    fun solve(view: View?) {
+        if (checkBTN.getText().toString() == "Check") {
+            gameBoardMan!!.getEmptyBoxIndexes()
+
+            val solveBoardThread = SolveBoardThread()
+
+            Thread(solveBoardThread).start()
+            val solveHelper = gameBoardMan!!.solveHelper(0, 0, gameBoard!!)
+            if (!solveHelper) {
+                Toast.makeText(
+                    applicationContext,
+                    "¡No cumpliste las reglas! Perdiste.",
+                    Toast.LENGTH_SHORT
+                )
+                    .show();
+                val intent = Intent(this@SudokuActivity, MainActivity::class.java)
+                Handler().postDelayed({
+                    startActivity(intent)
+                    finish()
+                }, 200)
+
+            }
+            if (solveHelper) {
+                Toast.makeText(
+                    applicationContext,
+                    "¡Felicitaciones! Ganaste.",
+                    Toast.LENGTH_SHORT
+                ).show();
+                val intent = Intent(this@SudokuActivity, MainActivity::class.java)
+                Handler().postDelayed({
+                    startActivity(intent)
+                    finish()
+                }, 4000)
+            }
+
+            gameBoard!!.invalidate()
+        }
+    }
+
+    inner class SolveBoardThread : Runnable {
+        override fun run() {
+            val solveHelper = gameBoardMan!!.solveHelper(0, 0, gameBoard!!)
+            gameBoard!!.let { solveHelper }
+
+        }
+
+    }
+
 }
 

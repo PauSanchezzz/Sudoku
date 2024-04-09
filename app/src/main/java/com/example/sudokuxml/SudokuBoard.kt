@@ -17,7 +17,6 @@ class SudokuBoard(context: Context, attributeSet: AttributeSet) : View(context, 
     private val size = 9
     private var cellSize = 0
     private var cellSizePixels = 0F
-    private var noteSizePixels = 0F
     private var selectedRow = -1
     private var selectedCol = -1
     private val gameBoard = BoardManager()
@@ -45,15 +44,9 @@ class SudokuBoard(context: Context, attributeSet: AttributeSet) : View(context, 
         color = Color.parseColor("#CDE7E4")
     }
 
-    private val textPaint = Paint().apply {
+    private val errorCellPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
-        color = Color.BLACK
-    }
-
-    private val startingCellTextPaint = Paint().apply {
-        style = Paint.Style.FILL_AND_STROKE
-        color = Color.BLACK
-        typeface = Typeface.DEFAULT_BOLD
+        color = Color.parseColor("#FF0606")
     }
 
     private val noteTextPaint = Paint().apply {
@@ -81,10 +74,7 @@ class SudokuBoard(context: Context, attributeSet: AttributeSet) : View(context, 
 
     private fun updateMeasurements(width: Int) {
         cellSizePixels = width / size.toFloat()
-        noteSizePixels = cellSizePixels / sqrtSize.toFloat()
         noteTextPaint.textSize = cellSizePixels / sqrtSize.toFloat()
-        textPaint.textSize = cellSizePixels / 1.5F
-        startingCellTextPaint.textSize = cellSizePixels / 1.5F
     }
 
     private fun fillCells(canvas: Canvas) {
@@ -93,10 +83,36 @@ class SudokuBoard(context: Context, attributeSet: AttributeSet) : View(context, 
             for (r in 0..size) {
                 for (c in 0..size) {
                     if (r == selectedRow && c == selectedCol) {
+                        val numberPosition = gameBoard.numberOfPosition(r, c)
+                        if (numberPosition == 0) {
+                            gameBoard.selectedNumber = 0
+                        }
                         fillCell(canvas, r, c, selectedCellPaint)
-                    } else if (r == selectedRow || c == selectedCol) {
+
+                    } else if ((r != 9 && c != 9) && (r == selectedRow || c == selectedCol)) {
+
+                        val num = gameBoard.selectedNumber
+                        val numberPosition = gameBoard.numberOfPosition(r, c)
+
+                        val isValid = gameBoard.isValid(r, c, num)
+
+                        if (!isValid && num != 0 && numberPosition == num) {
+                            fillCell(canvas, r, c, errorCellPaint)
+                            continue
+                        }
                         fillCell(canvas, r, c, conflictingCellPaint)
+
                     } else if (r / sqrtSize == selectedRow / sqrtSize && c / sqrtSize == selectedCol / sqrtSize) {
+
+                        val num = gameBoard.selectedNumber
+                        val numberPosition = gameBoard.numberOfPosition(r, c)
+                        val isValid = gameBoard.isValid(r, c, num)
+
+                        if (!isValid && num != 0 && numberPosition == num) {
+                            fillCell(canvas, r, c, errorCellPaint)
+                            continue
+                        }
+
                         fillCell(canvas, r, c, conflictingCellPaint)
                     }
                 }
@@ -145,17 +161,17 @@ class SudokuBoard(context: Context, attributeSet: AttributeSet) : View(context, 
         for (r in 0..8) {
             for (c in 0..8) {
                 if (gameBoard.getBoardFromGetter().get(r).get(c) != 0) {
-                    val text = gameBoard.getBoardFromGetter()[r][c].toString()
+                    val num = gameBoard.getBoardFromGetter()[r][c].toString()
 
                     var width: Float
                     var height: Float
-                    noteTextPaint.getTextBounds(text, 0, text.length, letterPaintBounds)
-                    width = noteTextPaint.measureText(text)
+                    noteTextPaint.getTextBounds(num, 0, num.length, letterPaintBounds)
+                    width = noteTextPaint.measureText(num)
                     height = letterPaintBounds.height().toFloat()
 
-                    val textX = c * cellSize + (cellSize - width) / 2
-                    val textY = r * cellSize + cellSize - (cellSize - height) / 2
-                    canvas.drawText(text, textX, textY, noteTextPaint)
+                    val numX = c * cellSize + (cellSize - width) / 2
+                    val numY = r * cellSize + cellSize - (cellSize - height) / 2
+                    canvas.drawText(num, numX, numY, noteTextPaint)
                 }
             }
         }
@@ -166,10 +182,13 @@ class SudokuBoard(context: Context, attributeSet: AttributeSet) : View(context, 
         return when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 gameBoard.setSelectedRow(Math.ceil((event.y / cellSizePixels).toDouble()).toInt());
-                gameBoard.setSelectedColumn(Math.ceil((event.x / cellSizePixels).toDouble()).toInt())
+                gameBoard.setSelectedColumn(
+                    Math.ceil((event.x / cellSizePixels).toDouble()).toInt()
+                )
                 handleTouchEvent(event.x, event.y)
                 true
             }
+
             else -> false
         }
     }
